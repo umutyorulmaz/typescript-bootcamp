@@ -6,7 +6,7 @@
     "setup": "npm i && dfx canister create backend && dfx generate backend && dfx deploy",
     "start": "run-p frontend",
     "frontend": "vite --port 3000",
-    "backend" : "dfx deploy backend",
+    "backend": "dfx deploy backend",
     "build": "tsc && vite build",
     "test": "run-s  test:frontend",
     "pretest:backend": "AZLE_REBUILD=true ts-node -P tsconfig.node.json --transpile-only --ignore=false backend/tests/pretest.ts",
@@ -15,11 +15,11 @@
     "format": "prettier --write \"src/**/*.{json,js,jsx,ts,tsx,css,scss}\" "
   },
   "dependencies": {
+    "@dfinity/auth-client": "^0.18.1",
+    "@dfinity/identity": "^0.18.1",
     "azle": "^0.17.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@dfinity/auth-client": "^0.18.1",
-    "@dfinity/identity": "^0.18.1",
     "ts-node": "10.7.0"
   },
   "devDependencies": {

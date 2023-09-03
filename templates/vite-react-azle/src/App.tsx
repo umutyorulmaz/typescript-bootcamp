@@ -5,6 +5,7 @@ import azleShadow from './assets/azle_shadow.png';
 import reactLogo from './assets/react.svg';
 import viteLogo from './assets/vite.svg';
 import { backend } from './declarations/backend';
+import { AuthClient } from '@dfinity/auth-client';
 
 function App() {
   const [count, setCount] = useState<number | undefined>();
@@ -22,16 +23,22 @@ function App() {
       setLoading(false);
     }
   };
+  const login = async () => {
+    const authClient = await AuthClient.create();
+    const isLocalNetwork = process.env.DFX_NETWORK == 'local';
+    const identityProviderUrl = isLocalNetwork
+      ? `http://127.0.0.1:4943/?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}`
+      : 'https://identity.ic0.app/';
 
-  const increment = async () => {
-    if (loading) return; // Cancel if waiting for a new count
-    try {
-      setLoading(true);
-      await backend.inc(); // Increment the count by 1
-      await fetchCount(); // Fetch the new count
-    } finally {
-      setLoading(false);
-    }
+    authClient.login({
+      identityProvider: identityProviderUrl,
+      maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),
+      onSuccess: async () => {
+        const identity = await authClient.getIdentity();
+        const principal = identity.getPrincipal().toString();
+        console.log(`logged in as ${principal}`);
+      },
+    });
   };
 
   // Fetch the count on page load
@@ -48,10 +55,7 @@ function App() {
         <a href="https://reactjs.org" target="_blank">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
-        <a
-          href="https://github.com/demergent-labs/azle"
-          target="_blank"
-        >
+        <a href="https://github.com/demergent-labs/azle" target="_blank">
           <span className="logo-stack">
             <img
               src={azleShadow}
@@ -64,8 +68,8 @@ function App() {
       </div>
       <h1>Vite + React + Azle</h1>
       <div className="card">
-        <button onClick={increment} style={{ opacity: loading ? 0.5 : 1 }}>
-          Count is {count}
+        <button onClick={login} style={{ opacity: loading ? 0.5 : 1 }}>
+          Please login
         </button>
       </div>
       <p className="read-the-docs">
