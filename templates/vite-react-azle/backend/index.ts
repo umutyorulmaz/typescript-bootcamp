@@ -1,26 +1,42 @@
-import { $query, $update, nat } from 'azle';
+import { Opt, $query, Record, $update, Vec } from 'azle';
 
-// This is a global variable that is stored on the heap
-let counter : nat = BigInt(0);
+type Db = {
+  users: {
+    [id: string]: User;
+  };
+};
 
-// Query calls complete quickly because they do not go through consensus
+type User = Record<{
+  id: string;
+  username: string;
+}>;
+
+let db: Db = {
+  users: {},
+};
+
 $query;
-export function get(): nat {
-    return counter;
+export function getUserById(id: string): Opt<User> {
+  const userOrUndefined = db.users[id];
+
+  return userOrUndefined ? Opt.Some(userOrUndefined) : Opt.None;
 }
 
-// Update calls take a few seconds to complete
-// This is because they persist state changes and go through consensus
-$update;
-export function add(n : nat): nat {
-    counter += n; //
-    return counter;
+$query;
+export function getAllUsers(): Vec<User> {
+  return Object.values(db.users);
 }
-
 
 $update;
-export function inc(): nat {
-    counter += BigInt(1);
-    return counter
-}
+export function createUser(username: string): User {
+  const id = Object.keys(db.users).length.toString();
 
+  const user = {
+    id,
+    username,
+  };
+
+  db.users[id] = user;
+
+  return user;
+}
