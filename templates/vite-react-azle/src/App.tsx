@@ -8,21 +8,7 @@ import { backend } from './declarations/backend';
 import { AuthClient } from '@dfinity/auth-client';
 
 function App() {
-  const [count, setCount] = useState<number | undefined>();
   const [loading, setLoading] = useState(false);
-
-  // Get the current counter value
-  const fetchCount = async () => {
-    try {
-      setLoading(true);
-      const count = await backend.get();
-      setCount(+count.toString()); // Convert BigInt to number
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
   const login = async () => {
     const authClient = await AuthClient.create();
     const isLocalNetwork = process.env.DFX_NETWORK == 'local';
@@ -41,10 +27,12 @@ function App() {
     });
   };
 
-  // Fetch the count on page load
-  useEffect(() => {
-    fetchCount();
-  }, []);
+  // const actor = Actor.createActor(idlFactory, {
+  //   agent: new HttpAgent({
+  //     identity,
+  //   }),
+  //   canisterId,
+  //});
 
   return (
     <div className="App">
